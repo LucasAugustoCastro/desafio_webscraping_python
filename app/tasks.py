@@ -2,8 +2,8 @@ from celery import Celery
 celery = Celery(__name__)
 celery.config_from_object(
   {
-    'broker_url': 'pyamqp://guest@localhost//',
-    'result_backend': 'redis://localhost:6379/0'
+    'broker_url': 'pyamqp://guest@rabbitmq//',
+    'result_backend': 'redis://redis:6379/0'
   }
 )
 

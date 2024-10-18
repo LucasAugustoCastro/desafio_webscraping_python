@@ -1,2 +1,0 @@
-fastapi[standard]
-celery==5.4.0

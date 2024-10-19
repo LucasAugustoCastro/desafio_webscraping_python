@@ -1,7 +1,13 @@
-import requests as req
 from scrap_worker import celery
-
+from scrap_worker.scrape_sintegra import ScrapeSintegra
 
 @celery.task(name='scrape-cnpj')
 def scrape_cnpj(cnpj: str):
-  print(f'é isso: {cnpj}')
+  try:
+    scrapper = ScrapeSintegra()
+    page = scrapper.scrape(cnpj)
+    data = scrapper.extract_page(page)
+  except Exception as e:
+    data = {'error': str(e)}
+  return data
+  

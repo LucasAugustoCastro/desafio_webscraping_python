@@ -8,11 +8,14 @@ from selenium.webdriver.firefox.options import Options
 from bs4 import BeautifulSoup
 
 class ScrapeSintegra:
-  def __init__(self):
-    firefox_options = Options()
-    firefox_options.add_argument('--headless')
-    service = Service('/usr/local/bin/geckodriver')
-    self.driver = webdriver.Firefox(service=service, options=firefox_options)
+  def __init__(self, driver=None):
+    if not driver:
+      firefox_options = Options()
+      firefox_options.add_argument('--headless')
+      service = Service('/usr/local/bin/geckodriver')
+      self.driver = webdriver.Firefox(service=service, options=firefox_options)
+    else:
+      self.driver = driver
 
   def scrape(self, cnpj):
     try:
@@ -36,22 +39,23 @@ class ScrapeSintegra:
   def extract_page(self, data):
     soup = BeautifulSoup(data, 'html.parser')
     data = {
-      'cnpj':soup.find('span', class_='label_title', text=re.compile('CNPJ')).find_next('span', class_='label_text').get_text(strip=True),
-      'inscricao_estadual':soup.find('span', class_='label_title', text=re.compile('Inscrição Estadual')).find_next('span', class_='label_text').get_text(strip=True),
-      'cadastro_atualizado_em':soup.find('span', class_='label_title', text=re.compile('Cadastro Atualizado em')).find_next('span', class_='label_text').get_text(strip=True),
-      'nome_empresarial':soup.find('span', class_='label_title', text=re.compile('Nome Empresarial')).find_next('span', class_='label_text').get_text(strip=True),
-      'contribuinte':soup.find('span', class_='label_title', text=re.compile('Contribuinte?')).find_next('span', class_='label_text').get_text(strip=True),
-      'endereco':soup.find('div', class_='label_title', text=re.compile('Endereço Estabelecimento')).find_next('span', class_='label_text').get_text(strip=True),
-      'atividade_principal':soup.find('span', class_='label_text', text=re.compile('Atividade Principal')).find_next('span', class_='label_text').get_text(strip=True),
-      'regime_de_apuracao':soup.find('span', class_='label_title', text=re.compile('Regime de Apuração')).find_next('span', class_='label_text').get_text(strip=True),
-      'situacao_cadastral_vigente':soup.find('span', class_='label_title', text=re.compile('Situação Cadastral Vigente')).find_next('span', class_='label_text').get_text(strip=True),
-      'data_de_cadastramento':soup.find('span', class_='label_title', text=re.compile('Data de Cadastramento')).find_next('span', class_='label_text').get_text(strip=True),
-      'data_de_consulta':soup.find('span', class_='label_title', text=re.compile('Data da Consulta')).find_next('span', class_='label_text').get_text(strip=True),
-      'nome_fantasia': None,
+      'cnpj': self._get_field(soup, 'CNPJ'),
+      'inscricao_estadual': self._get_field(soup, 'Inscrição Estadual'),
+      'cadastro_atualizado_em': self._get_field(soup, 'Cadastro Atualizado em'),
+      'nome_empresarial': self._get_field(soup, 'Nome Empresarial'),
+      'contribuinte':self._get_field(soup, 'Contribuinte?'),
+      'endereco': self._get_field(soup, 'Endereço Estabelecimento', tag='div'),
+      'atividade_principal': self._get_field(soup, 'Atividade Principal'),
+      'regime_de_apuracao': self._get_field(soup, 'Regime de Apuração'),
+      'situacao_cadastral_vigente': self._get_field(soup, 'Situação Cadastral Vigente'),
+      'data_de_cadastramento': self._get_field(soup, 'Data de Cadastramento'),
+      'data_de_consulta': self._get_field(soup, 'Data da Consulta'),
+      'nome_fantasia': self._get_field(soup, 'Nome Fantasia')
     }
-    trade_name = soup.find('span', class_='label_title', text=re.compile('Nome Fantasia'))
-    if trade_name:
-      trade_name = trade_name.find_next('span', class_='label_text').get_text(strip=True)
-      data['nome_fantasia'] = trade_name
-    
     return data
+  
+  def _get_field(self, soup, field, tag='span'):
+    field = soup.find(tag, text=re.compile(field))
+    if not field:
+      return None
+    return field.find_next('span', class_='label_text').get_text(strip=True)

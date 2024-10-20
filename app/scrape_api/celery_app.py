@@ -1,5 +1,6 @@
 from celery import Celery
-from config import BROKER_URL, RESULT_BACKEND
+
+from scrape_api.config import BROKER_URL, RESULT_BACKEND
 
 celery = Celery(__name__)
 celery.config_from_object(

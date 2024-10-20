@@ -1,15 +1,10 @@
 from celery import Celery
 from kombu import Queue
+from dotenv import load_dotenv
 
-class Config(object):
-  broker_url = 'amqp://guest:guest@rabbitmq:5672/'
-  result_backend = 'redis://redis:6379/0'
-  task_queues = {
-    Queue(name="scrape-cnpj"),
-  }
-  task_routes = {
-    'scrape-cnpj': {'queue': 'scrape-cnpj'},
-  }
+load_dotenv()
+
+from config import CeleryConfig
 
 celery = Celery(__name__)
-celery.config_from_object(Config)
+celery.config_from_object(CeleryConfig)

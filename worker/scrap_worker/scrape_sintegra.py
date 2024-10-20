@@ -34,19 +34,24 @@ class ScrapeSintegra:
     return data
   
   def extract_page(self, data):
-    print("processando dados")
     soup = BeautifulSoup(data, 'html.parser')
-    data = {}
-    data['CNPJ'] = soup.find('span', class_='label_title', text=re.compile('CNPJ')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Inscrição Estadual'] = soup.find('span', class_='label_title', text=re.compile('Inscrição Estadual')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Cadastro Atualizado em'] = soup.find('span', class_='label_title', text=re.compile('Cadastro Atualizado em')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Nome Empresarial'] = soup.find('span', class_='label_title', text=re.compile('Nome Empresarial')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Contribuinte'] = soup.find('span', class_='label_title', text=re.compile('Contribuinte?')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Nome Fantasia'] = soup.find('span', class_='label_title', text=re.compile('Nome Fantasia')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Endereço'] = soup.find('div', class_='label_title', text=re.compile('Endereço Estabelecimento')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Atividade Principal'] = soup.find('span', class_='label_text', text=re.compile('Atividade Principal')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Regime de Apuração'] = soup.find('span', class_='label_title', text=re.compile('Regime de Apuração')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Situação Cadastral Vigente'] = soup.find('span', class_='label_title', text=re.compile('Situação Cadastral Vigente')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Data de Cadastramento'] = soup.find('span', class_='label_title', text=re.compile('Data de Cadastramento')).find_next('span', class_='label_text').get_text(strip=True)
-    data['Data da Consulta'] = soup.find('span', class_='label_title', text=re.compile('Data da Consulta')).find_next('span', class_='label_text').get_text(strip=True)
+    data = {
+      'cnpj':soup.find('span', class_='label_title', text=re.compile('CNPJ')).find_next('span', class_='label_text').get_text(strip=True),
+      'inscricao_estadual':soup.find('span', class_='label_title', text=re.compile('Inscrição Estadual')).find_next('span', class_='label_text').get_text(strip=True),
+      'cadastro_atualizado_em':soup.find('span', class_='label_title', text=re.compile('Cadastro Atualizado em')).find_next('span', class_='label_text').get_text(strip=True),
+      'nome_empresarial':soup.find('span', class_='label_title', text=re.compile('Nome Empresarial')).find_next('span', class_='label_text').get_text(strip=True),
+      'contribuinte':soup.find('span', class_='label_title', text=re.compile('Contribuinte?')).find_next('span', class_='label_text').get_text(strip=True),
+      'endereco':soup.find('div', class_='label_title', text=re.compile('Endereço Estabelecimento')).find_next('span', class_='label_text').get_text(strip=True),
+      'atividade_principal':soup.find('span', class_='label_text', text=re.compile('Atividade Principal')).find_next('span', class_='label_text').get_text(strip=True),
+      'regime_de_apuracao':soup.find('span', class_='label_title', text=re.compile('Regime de Apuração')).find_next('span', class_='label_text').get_text(strip=True),
+      'situacao_cadastral_vigente':soup.find('span', class_='label_title', text=re.compile('Situação Cadastral Vigente')).find_next('span', class_='label_text').get_text(strip=True),
+      'data_de_cadastramento':soup.find('span', class_='label_title', text=re.compile('Data de Cadastramento')).find_next('span', class_='label_text').get_text(strip=True),
+      'data_de_consulta':soup.find('span', class_='label_title', text=re.compile('Data da Consulta')).find_next('span', class_='label_text').get_text(strip=True),
+      'nome_fantasia': None,
+    }
+    trade_name = soup.find('span', class_='label_title', text=re.compile('Nome Fantasia'))
+    if trade_name:
+      trade_name = trade_name.find_next('span', class_='label_text').get_text(strip=True)
+      data['nome_fantasia'] = trade_name
+    
     return data
